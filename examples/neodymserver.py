@@ -29,20 +29,30 @@ def getDeviceById(id):
    for element in devices:
       if((element["id"] == id) ):
          return element
+      
+def executeCommand(device, message):
+   print("führe Befehl aus: " + str(message))
+
+   # wenn Password ändern:
+   if(message["command"] == "changePassword"):
+      getDeviceById(device)["password"] = message["value"]
+      return '{"success": true}'
+
 
 async def handle(websocket, path):
    
    global devices
-
+   connectedDevice = 0
    data = await websocket.recv()
    jsonresult = json.loads(data)
-
 
    try:
       element = getDeviceById(jsonresult["id"])
       if(element["password"] == jsonresult["password"]):
-         reply = '{"success" true, "id": '+ str(jsonresult["id"]) + '}'
+         connectedDevice = jsonresult["id"]
+         reply = '{"success" true, "id": '+ str(connectedDevice) + '}'
          element["websocket"] = websocket
+         
       else:
          reply = '{"success" false}'
    except:
@@ -77,7 +87,10 @@ async def handle(websocket, path):
    async for message in websocket:
       decoded = json.loads(message)
       try:
-         await getDeviceById(decoded["id"])["websocket"].send(message)
+         if(decoded["id"] == 0):
+            await getDeviceById(connectedDevice)["websocket"].send(executeCommand(connectedDevice, decoded))
+         else:
+            await getDeviceById(decoded["id"])["websocket"].send(message)
         
       except:
          print("fehler")
