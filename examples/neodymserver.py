@@ -2,11 +2,33 @@ import asyncio
 import websockets
 import json
 
-# NEODYM Server Beta V1
+# NEODYM Server Beta V2
 # akzeptiert Websocket Verbindungen und leitet Befehle weiter
+# und speichert geräte
 
 
-devices = [0,0,0]
+devices = [
+   {
+    "id": 0,
+    "password": "",
+    "websocket": ""
+   },
+   {
+    "id": 1,
+    "password": "1234",
+    "websocket": ""
+   },
+   {
+    "id": 2,
+    "password": "5678",
+    "websocket": ""
+   },
+]
+
+def getDeviceById(id):
+   for element in devices:
+      if((element["id"] == id) ):
+         return element
 
 async def handle(websocket, path):
    
@@ -15,17 +37,35 @@ async def handle(websocket, path):
    data = await websocket.recv()
    jsonresult = json.loads(data)
 
-   if((jsonresult["id"] == 1) & (jsonresult["password"] == "1234")):
-      reply = '{"success" true, "id": 1}'
-      devices[1] = websocket
 
-   elif((jsonresult["id"] == 2) & (jsonresult["password"] == "5678")):
-      reply = '{"success" true, "id": 2}'
-      devices[2] = websocket
-      print("Lampe verbunden")
+   try:
+      element = getDeviceById(jsonresult["id"])
+      if(element["password"] == jsonresult["password"]):
+         reply = '{"success" true, "id": '+ str(jsonresult["id"]) + '}'
+         element["websocket"] = websocket
+      else:
+         reply = '{"success" false}'
+   except:
+      reply = '{"success" false}'
 
-   else:
-      reply = '{"success" false, "id": 0}'
+   
+   # for element in devices:
+   #    if((element["id"] == jsonresult["id"]) & (element["password"] == jsonresult["password"])):
+   #       reply = '{"success" true, "id": '+ str(jsonresult["id"]) + '}'
+   #       element["websocket"] = websocket
+   
+
+   # if((jsonresult["id"] == 1) & (jsonresult["password"] == "1234")):
+   #    reply = '{"success" true, "id": 1}'
+   #    devices[1] = websocket
+
+   # elif((jsonresult["id"] == 2) & (jsonresult["password"] == "5678")):
+   #    reply = '{"success" true, "id": 2}'
+   #    devices[2] = websocket
+   #    print("Lampe verbunden")
+
+   # else:
+   #    reply = '{"success" false, "id": 0}'
 
    # alle angemeldeten Geräte ausgeben
    print("\n angemeldete Geräte:")
@@ -36,8 +76,11 @@ async def handle(websocket, path):
 
    async for message in websocket:
       decoded = json.loads(message)
-      if(decoded["id"] == 2):
-          await devices[2].send(message)
+      try:
+         await getDeviceById(decoded["id"])["websocket"].send(message)
+        
+      except:
+         print("fehler")
 
 
 
