@@ -3,10 +3,21 @@
 ## Ziel
 Neodym soll ein Protokoll werden, damit verschiedene Geräte über einen zentralen Server miteinander kommunizieren können.
 
+---
 
+## Funktionen
+
+### Verbindungen
+Ein Server nimmt websocket Verbindungen der verschiedenen Geräte an und überprüft die Anmeldedaten.
+
+### Commands
+Die verbundenen Geräte können Befehle an den Server senden und er leitet diese dann an die entsprechenden Empfänger weiter.
+
+---
 
 ## Protokoll
 
+### Verbindungsaufbau
 1. Das Gerät baut eine Websocketverbindung mit dem Neodym-server an Port 8000 auf. 
 2. Es sendet seine Anmeldedaten als JSON formatiert nach folgendem Muster: 
    `{"id": <ID>, "password": "<PASSWORD>"}`
