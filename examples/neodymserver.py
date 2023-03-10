@@ -16,16 +16,16 @@ async def handle(websocket, path):
    jsonresult = json.loads(data)
 
    if((jsonresult["id"] == 1) & (jsonresult["password"] == "1234")):
-      reply = "eingeloggt als Nutzer 1"
+      reply = '{"success" true, "id": 1}'
       devices[1] = websocket
 
    elif((jsonresult["id"] == 2) & (jsonresult["password"] == "5678")):
-      reply = "eingeloggt als Nutzer 2"
+      reply = '{"success" true, "id": 2}'
       devices[2] = websocket
       print("Lampe verbunden")
 
    else:
-      reply = "garnicht eingeloggt..."
+      reply = '{"success" false, "id": 0}'
 
    # alle angemeldeten Geräte ausgeben
    print("\n angemeldete Geräte:")
