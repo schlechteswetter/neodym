@@ -1,10 +1,5 @@
 # Neodym Beta V1
 
-## Ziel
-Neodym soll ein Protokoll werden, damit verschiedene Geräte über einen zentralen Server miteinander kommunizieren können.
-
----
-
 ## Funktionen
 
 ### Verbindungen
