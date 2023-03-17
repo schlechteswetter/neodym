@@ -13,7 +13,7 @@ import websockets
  
 async def login():
     async with websockets.connect('ws://localhost:8000') as websocket:
-        await websocket.send('{ "id":1, "password":"1234"}')
+        await websocket.send('{"id": 0, "command":"login", "value": {"id": 1, "password": "1234"}}')
         response = await websocket.recv()
         print(response)
         await websocket.send('{ "id":0, "command":"changePassword", "value": "hello"}')

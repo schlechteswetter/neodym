@@ -1,7 +1,8 @@
 # Neodym Beta V2
 
-## Ziel
-Neodym soll ein Protokoll werden, damit verschiedene Geräte über einen zentralen Server miteinander kommunizieren können.
+---
+## Änderungen zu Beta-V1:
+- Der Login Command wurde angepasst
 
 ---
 
@@ -14,7 +15,7 @@ Neodym soll ein Protokoll werden, damit verschiedene Geräte über einen zentral
 ## Funktionen
 
 ### Verbindungen
-Ein Server nimmt websocket Verbindungen der verschiedenen Geräte an und überprüft die Anmeldedaten. 
+Ein Server nimmt websocket Verbindungen der verschiedenen Geräte an und kann auch mit ID0 commands empfangen.
 
 ### Commands
 Die verbundenen Geräte können Befehle an den Server senden und er leitet diese dann an die entsprechenden Empfänger weiter.
@@ -35,15 +36,15 @@ mit einem verbundenen Gerät können Anmeldedaten für ein neues Gerät angeford
 ### Verbindungsaufbau
 
 1. Das Gerät baut eine Websocketverbindung mit dem Neodym-server an Port 8000 auf. 
-2. Es sendet seine Anmeldedaten als JSON formatiert nach folgendem Muster: 
-   `{"id": <ID>, "password": "<PASSWORD>"}`
+2. Es sendet seine Anmeldedaten als Neodym Befehl formatiert an den Server adressiert: 
+   `{"id": 0, "command":"login", "value": {"id": <ID>, "password": "<PASSWORD>"}}`
 3. Der Server sendet eine Antwort, dass die anmeldung erfolgreich war:
   `{"success" true, "id": <ID>}`
 4. wenn keine antwort zurückkommt oder success false ist, dann kann der Client den Anmeldevorgang wiederholen
 5. wenn die Anmeldung erfolgreich war, dann kann der Client Befehle/Nachrichten an andere Geräte senden und selbst welche empfangen. Ein Befehl muss nach folgendem Muster aufgebaut sein:
 `{"id": <EMPFÄNGER>, "command": "<BEFEHLNAME>", "value": "<PARAMETER>"}`
 
-### neues Gerät registrieren
+### neues Gerät registrieren (mach ich doch anders)
 1. Gerät baut Verbindung auf
 2. Gerät sendet Befehl an ID 0 (Neodym Server selbst), dass ein neues Gerät hinzugefügt werden soll:
 `{"id":0, "command": "registerNewDevice", "value":{"id": <NEUE GERÄTE ID>, "password": <PASSWORT>}}`

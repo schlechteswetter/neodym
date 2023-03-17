@@ -6,6 +6,8 @@ import json
 # akzeptiert Websocket Verbindungen und leitet Befehle weiter
 # und speichert geräte
 
+# veraltet....
+
 
 devices = [
    {
