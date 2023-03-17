@@ -83,9 +83,23 @@ def executeCommand(device, message):
    print("führe Befehl aus: " + str(message))
 
    # wenn Password ändern:
-   # if(message["command"] == "changePassword"):
-   #    getDeviceById(device)["password"] = message["value"]
-   #    return '{"success": true}'
+   if(message["command"] == "changePassword"):
+      if(changePassword(device, message["value"])):
+         return '{"success": true}'
+      else:
+         return '{"success": false}'
+   
+def changePassword(id, newPassword):
+   try:
+      connection = sqlite3.connect("devices.db")
+      cursor = connection.cursor()
+      cursor.execute("UPDATE devices set password = ? where id=?",[newPassword,str(id)])
+      connection.commit()
+      connection.close()
+      return True
+   except Exception as e:
+      print(str(e))
+      return False
 
 
 # alle angemeldeten Geräte ausgeben
@@ -101,35 +115,29 @@ def printConnectedDevices():
 
 async def handle(websocket, path):
    global connectedDevices
-   connectedDevice = 0
    data = await websocket.recv()
    jsonresult = json.loads(data)
    id = jsonresult["id"]
 
-   try:
-      print("Loginversuch mit " + str(id))
-      if(login(jsonresult["id"], jsonresult["password"])):
-         print("erfolgreich")
-         reply = '{"success" true, "id": '+ str(connectedDevice) + '}' 
-         element = getDeviceById(jsonresult["id"])
-         connectedDevice = jsonresult["id"]
-         element["websocket"] = websocket
-         
-      else:
-         reply = '{"success" false}'
-   except:
+   print("Loginversuch mit " + str(id))
+   if(login(jsonresult["id"], jsonresult["password"])):
+      print("erfolgreich")
+      reply = '{"success" true, "id": '+ str(id) + '}' 
+      element = getDeviceById(jsonresult["id"])
+      element["websocket"] = websocket
+   else:
       reply = '{"success" false}'
 
-   
    printConnectedDevices()
       
    await websocket.send(reply)
 
+   # auf Nachrichten warten
    async for message in websocket:
       decoded = json.loads(message)
       try:
          if(decoded["id"] == 0):
-            await getDeviceById(connectedDevice)["websocket"].send(executeCommand(connectedDevice, decoded))
+            await websocket.send(executeCommand(id, decoded))
          else:
             await getDeviceById(decoded["id"])["websocket"].send(message)
         
