@@ -56,15 +56,20 @@ def login(id, password):
    cursorr = connection.cursor()
    result = cursorr.execute("SELECT * FROM devices where id=" + str(id)).fetchall()
    connection.close()
-   if(result[0][1] == password):
+   if(result[0][1] == password) & getDeviceById(id) == False:
       connectedDevices.append({
        "id": result[0][0],
        "websocket": ""
        })
       return True
+   return False
 
 
-
+def removeFromConnectedDevices(id):
+   global connectedDevices
+   for element in connectedDevices:
+      if element["id"] == id:
+         connectedDevices.remove(element)
 
 
 def getDeviceById(id):
@@ -72,6 +77,7 @@ def getDeviceById(id):
    for element in connectedDevices:
       if((element["id"] == id) ):
          return element
+   return False
       
 def executeCommand(device, message):
    print("führe Befehl aus: " + str(message))
@@ -82,23 +88,32 @@ def executeCommand(device, message):
    #    return '{"success": true}'
 
 
+# alle angemeldeten Geräte ausgeben
+def printConnectedDevices():
+   global connectedDevices
+   print("\n angemeldete Geräte:")
+   for device in connectedDevices:
+      print(device)   
+
+
+
+
+
 async def handle(websocket, path):
    global connectedDevices
    connectedDevice = 0
    data = await websocket.recv()
    jsonresult = json.loads(data)
-
+   id = jsonresult["id"]
 
    try:
       print("Loginversuch mit " + str(id))
       if(login(jsonresult["id"], jsonresult["password"])):
          print("erfolgreich")
          reply = '{"success" true, "id": '+ str(connectedDevice) + '}' 
-      # element = getDeviceById(jsonresult["id"])
-      # if(element["password"] == jsonresult["password"]):
-      #    connectedDevice = jsonresult["id"]
-      #    reply = '{"success" true, "id": '+ str(connectedDevice) + '}'
-      #    element["websocket"] = websocket
+         element = getDeviceById(jsonresult["id"])
+         connectedDevice = jsonresult["id"]
+         element["websocket"] = websocket
          
       else:
          reply = '{"success" false}'
@@ -106,10 +121,7 @@ async def handle(websocket, path):
       reply = '{"success" false}'
 
    
-   # alle angemeldeten Geräte ausgeben
-   print("\n angemeldete Geräte:")
-   for device in connectedDevices:
-      print(device)   
+   printConnectedDevices()
       
    await websocket.send(reply)
 
@@ -122,7 +134,8 @@ async def handle(websocket, path):
             await getDeviceById(decoded["id"])["websocket"].send(message)
         
       except:
-         print("fehler")
+         removeFromConnectedDevices(id)
+   removeFromConnectedDevices(id)
 
 
 setupDatabase()
