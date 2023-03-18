@@ -30,22 +30,6 @@ def setupDatabase():
    print(cursor.execute("SELECT * FROM devices").fetchall())
 
    connection.close()
-   
-
-
-
-   #devices = []
-
-   # for device in DBresult:
-   #    devices.append({
-   #    "id": device[0],
-   #    "password": device[1],
-   #    "websocket": ""
-   #    })
-
-   # print(devices)
-
-
 
 
 
@@ -56,13 +40,25 @@ def login(id, password):
    cursorr = connection.cursor()
    result = cursorr.execute("SELECT * FROM devices where id=" + str(id)).fetchall()
    connection.close()
-   if(result[0][1] == password) & getDeviceById(id) == False:
+   if((result[0][1] == password) & (getDeviceById(id) == False)):
       connectedDevices.append({
        "id": result[0][0],
        "websocket": ""
        })
       return True
    return False
+
+def registerNewDevice(password):
+   connection = sqlite3.connect("devices.db")
+   cursor = connection.cursor()
+   result = cursor.execute("insert into devices (password) values (?)", [password])
+   connection.commit()
+   cursor = connection.cursor()
+   result = cursor.execute("SELECT * FROM devices ORDER BY id DESC LIMIT 1")
+   id= result.fetchall()
+   connection.close()
+   return id[0][0]
+   
 
 
 def removeFromConnectedDevices(id):
@@ -91,6 +87,7 @@ def executeCommand(device, message, websocket=False):
       else:
          return '{"success": false}'
       
+   # wenn Login
    if(message["command"] == "login"):
       anmeldedaten = message["value"]
 
@@ -102,7 +99,13 @@ def executeCommand(device, message, websocket=False):
          printConnectedDevices()
          return '{"success": true, "id": '+ str(anmeldedaten["id"]) + "}" 
       else:
-         return '{"success" false}'
+         return '{"success" false, "id": '+ str(anmeldedaten["id"]) + "}" 
+      
+   #wenn Neuanlage
+   if(message["command"] == "registerNew"):
+      id = registerNewDevice(str(message["value"]))
+      print(id)
+      return '{"success": true, "id": '+ str(id) + "}" 
 
    
 
