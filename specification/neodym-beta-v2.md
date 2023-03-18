@@ -22,11 +22,8 @@ Die verbundenen Geräte können Befehle an den Server senden und er leitet diese
 
 ### Geräteverwaltung
 
-- Passwort ändern:
-Geräte können ihr Passwort ändern
-
-- neue Geräte hinzufügen:
-mit einem verbundenen Gerät können Anmeldedaten für ein neues Gerät angefordert werden.
+- Passwort ändern: Geräte können ihr Passwort ändern
+- neue Geräte hinzufügen: mit einem verbundenen Gerät können Anmeldedaten für ein neues Gerät angefordert werden.
 
 ---
 
@@ -44,13 +41,12 @@ mit einem verbundenen Gerät können Anmeldedaten für ein neues Gerät angeford
 5. wenn die Anmeldung erfolgreich war, dann kann der Client Befehle/Nachrichten an andere Geräte senden und selbst welche empfangen. Ein Befehl muss nach folgendem Muster aufgebaut sein:
 `{"id": <EMPFÄNGER>, "command": "<BEFEHLNAME>", "value": "<PARAMETER>"}`
 
-### neues Gerät registrieren (mach ich doch anders)
+### neues Gerät registrieren
 1. Gerät baut Verbindung auf
 2. Gerät sendet Befehl an ID 0 (Neodym Server selbst), dass ein neues Gerät hinzugefügt werden soll:
-`{"id":0, "command": "registerNewDevice", "value":{"id": <NEUE GERÄTE ID>, "password": <PASSWORT>}}`
-wenn man keine id oder password mit angibt, soll der Server die zufällig generieren
-3. Der Server sendet eine Bestätigung mit ID und Passwort zurück:
-`{"success": true, "id": "<NEUE ID>", "password":"<PASSWORT>"}`
+`{"id":0, "command": "registerNew", "value":"<PASSWORT>"}`
+3. Der Server sendet eine Bestätigung mit der neuen ID zurück:
+`{"success": true, "id": "<NEUE ID>"}`
 
 ### Passwort ändern
 1. Gerät baut Verbindung auf
