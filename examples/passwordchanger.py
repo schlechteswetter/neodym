@@ -16,7 +16,9 @@ async def login():
         await websocket.send('{"id": 0, "command":"login", "value": {"id": 1, "password": "1234"}}')
         response = await websocket.recv()
         print(response)
-        await websocket.send('{ "id":2, "command":"light", "value": 1}')
+        await websocket.send('{ "id":0, "command":"changePassword", "value": "hello"}')
+        response = await websocket.recv()
+        print(response)
         await websocket.close()
  
 asyncio.get_event_loop().run_until_complete(login())

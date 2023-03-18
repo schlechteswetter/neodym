@@ -27,7 +27,7 @@ def on_close(ws, ws1,  ws2):
     print("Verbindung getrennt")
 
 def on_open(ws):
-    ws.send('{ "id":2, "password":"5678"}')
+    ws.send('{"id": 0, "command":"login", "value": {"id": 2, "password": "5678"}}')
     print("Verbindung erfolgreich\n")
 
 print("verbinde mit Neodym Server...")
